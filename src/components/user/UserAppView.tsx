@@ -30,6 +30,7 @@ import { UserAncHistoryView } from './UserAncHistoryView';
 import { UserConsultationModal } from './UserConsultationModal';
 import { UserProfileView } from './UserProfileView';
 import { EmergencyHelpModal } from './EmergencyHelpModal';
+import { UserMentalEducationView } from './UserMentalEducationView';
 
 interface UserAppViewProps {
   onSwitchToAdmin: () => void;
@@ -38,7 +39,7 @@ interface UserAppViewProps {
 export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => {
   const { currentUser, tpmbList, articles, cases, screenings, logout } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'beranda' | 'latihan' | 'anc' | 'riwayat' | 'profil'>('beranda');
+  const [activeTab, setActiveTab] = useState<'beranda' | 'latihan' | 'anc' | 'edukasi' | 'riwayat' | 'profil'>('beranda');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Modals state
@@ -97,6 +98,15 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
       },
     },
     {
+      id: 'edukasi' as const,
+      label: 'Edukasi Kesehatan Jiwa',
+      icon: BookOpen,
+      action: () => {
+        setActiveTab('edukasi');
+        setIsMobileSidebarOpen(false);
+      },
+    },
+    {
       id: 'profil' as const,
       label: 'Profil & Persetujuan',
       icon: UserIcon,
@@ -116,6 +126,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
       case 'anc':
       case 'riwayat':
         return isPregnant ? 'Pemeriksaan ANC & Riwayat Terpadu' : 'Pemeriksaan Nifas (PNC) & Riwayat Terpadu';
+      case 'edukasi':
+        return 'Pojok Edukasi Kesehatan Jiwa Perinatal';
       case 'profil':
         return 'Profil Ibu & Persetujuan (Informed Consent)';
       default:
@@ -677,14 +689,21 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                     <BookOpen className="w-4 h-4 text-sky-600" />
                     <span>Edukasi Kesehatan Jiwa Ibu</span>
                   </h3>
-                  <span className="text-[11px] text-slate-400 font-medium">Ditinjau oleh Bidan</span>
+                  <button
+                    onClick={() => setActiveTab('edukasi')}
+                    className="text-xs font-bold text-sky-600 hover:text-sky-700 transition-colors cursor-pointer"
+                  >
+                    Buka Semua Materi ({articles.length})
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {articles.map((art) => (
+                  {articles.slice(0, 4).map((art) => (
                     <div
                       key={art.id}
-                      onClick={() => setSelectedArticle(art)}
+                      onClick={() => {
+                        setSelectedArticle(art);
+                      }}
                       className="p-3.5 bg-slate-50/80 hover:bg-sky-50/70 rounded-2xl border border-slate-200/80 hover:border-sky-200 cursor-pointer transition-colors flex flex-col justify-between"
                     >
                       <div>
@@ -729,6 +748,13 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
             />
           )}
 
+          {activeTab === 'edukasi' && (
+            <UserMentalEducationView
+              onStartScreening={() => setIsScreeningOpen(true)}
+              onGoToSicring={() => setActiveTab('latihan')}
+            />
+          )}
+
           {activeTab === 'profil' && (
             <UserProfileView
               onBackToHome={() => setActiveTab('beranda')}
@@ -738,53 +764,65 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
         </main>
 
         {/* Mobile Fixed Bottom Navigation Bar */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-6 py-2.5 z-40 flex items-center justify-around shadow-lg select-none">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2 z-40 flex items-center justify-around shadow-lg select-none">
           <button
             onClick={() => setActiveTab('beranda')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
               activeTab === 'beranda'
                 ? 'text-sky-600 font-bold'
                 : 'text-slate-400 hover:text-slate-600 font-medium'
             }`}
           >
-            <Home className="w-5 h-5" />
-            <span className="text-[11px]">Beranda</span>
+            <Home className="w-4.5 h-4.5" />
+            <span className="text-[10px]">Beranda</span>
           </button>
 
           <button
             onClick={() => setActiveTab('latihan')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
               activeTab === 'latihan'
                 ? 'text-sky-600 font-bold'
                 : 'text-slate-400 hover:text-slate-600 font-medium'
             }`}
           >
-            <Heart className="w-5 h-5" />
-            <span className="text-[11px]">SICRING</span>
+            <Heart className="w-4.5 h-4.5" />
+            <span className="text-[10px]">SICRING</span>
           </button>
 
           <button
             onClick={() => setActiveTab('anc')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
               activeTab === 'anc' || activeTab === 'riwayat'
                 ? 'text-sky-600 font-bold'
                 : 'text-slate-400 hover:text-slate-600 font-medium'
             }`}
           >
-            <HeartHandshake className="w-5 h-5" />
-            <span className="text-[11px]">ANC & Riwayat</span>
+            <HeartHandshake className="w-4.5 h-4.5" />
+            <span className="text-[10px]">ANC</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('edukasi')}
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+              activeTab === 'edukasi'
+                ? 'text-sky-600 font-bold'
+                : 'text-slate-400 hover:text-slate-600 font-medium'
+            }`}
+          >
+            <BookOpen className="w-4.5 h-4.5" />
+            <span className="text-[10px]">Edukasi</span>
           </button>
 
           <button
             onClick={() => setActiveTab('profil')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors ${
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
               activeTab === 'profil'
                 ? 'text-sky-600 font-bold'
                 : 'text-slate-400 hover:text-slate-600 font-medium'
             }`}
           >
-            <UserIcon className="w-5 h-5" />
-            <span className="text-[11px]">Profil</span>
+            <UserIcon className="w-4.5 h-4.5" />
+            <span className="text-[10px]">Profil</span>
           </button>
         </nav>
       </div>

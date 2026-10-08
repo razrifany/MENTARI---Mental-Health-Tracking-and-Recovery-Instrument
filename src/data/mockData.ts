@@ -881,33 +881,127 @@ export const INITIAL_CONSULTATIONS: ConsultationRequest[] = [
 export const INITIAL_ARTICLES: EducationalArticle[] = [
   {
     id: 'art-01',
-    title: 'Mengenal Baby Blues vs Depresi Pascapersalinan',
+    title: 'Mengenal Baby Blues vs Depresi Pascapersalinan (PPD)',
     category: 'nifas',
-    readTime: '3 menit',
-    summary: 'Pahami perbedaan perasaan sedih wajar pasca melahirkan dan tanda yang memerlukan pertolongan bidan/tenaga kesehatan.',
-    content: 'Setelah melahirkan, perubahan hormon yang drastis, kelelahan fisik, dan adaptasi peran baru sering membuat ibu merasa sedih atau mudah menangis. Hal ini normal disebut baby blues jika berlangsung kurang dari 14 hari. Namun, jika kesedihan berlarut, ada rasa putus asa mendalam, atau ketakutan tidak mampu merawat bayi, segeralah bercerita kepada bidan.',
+    readTime: '4 menit',
+    summary: 'Pahami perbedaan perasaan sedih wajar pasca melahirkan dan tanda klinis yang memerlukan pertolongan bidan atau psikolog.',
+    content: `Setelah melahirkan, fluktuasi hormon estrogen dan progesteron yang menurun drastis, kelelahan fisik ekstrem pasca persalinan, serta adaptasi peran baru sering membuat ibu merasa sangat emosional, mudah tersinggung, atau menangis tanpa alasan jelas.
+
+Kondisi ini dikenal sebagai Baby Blues Syndrome jika terjadi dalam 2–14 hari pertama pascapersalinan dan mereda dengan sendirinya seiring istirahat yang cukup.
+
+Namun, bila perasaan hampa, rasa bersalah berlebih, ketidakmampuan merasakan ikatan batin (bonding) dengan bayi, atau kecemasan luar biasa menetap lebih dari 2 minggu, kondisi ini mengarah ke Postpartum Depression (PPD).
+
+Tanda Waspada yang Memerlukan Bantuan:
+1. Menangis hampir setiap hari tanpa pemicu yang jelas.
+2. Kehilangan minat terhadap hal-hal yang biasanya menyenangkan.
+3. Merasa menjadi ibu yang gagal atau tidak pantas memiliki anak.
+4. Muncul rasa takut berlebihan ditinggal sendirian bersama bayi.
+5. Terlintas pikiran untuk lari dari kenyataan atau mencelakai diri.
+
+Langkah Pertama yang Bisa Dilakukan:
+Bicaralah terbuka kepada bidan TPMB Anda atau pasangan. Anda tidak sedang gagal; tubuh dan pikiran Anda hanya membutuhkan uluran tangan pemulihan. Latihan pernapasan hening SICRING Modul 1 dan 2 dapat membantu menenangkan sistem saraf simpatik Anda.`,
     reviewedBy: 'Bdn. Hj. Sri Wahyuni, S.ST, M.Keb',
-    publishedDate: '2026-08-15',
+    publishedDate: '2026-09-15',
+    tags: ['Nifas', 'BabyBlues', 'PPD', 'SkriningEPDS'],
+    status: 'published',
   },
   {
     id: 'art-02',
-    title: 'Peran Suami & Keluarga dalam Menjaga Kesejahteraan Emosional Ibu',
+    title: 'Peran Suami & Support System: Jangkar Ketenangan Ibu Perinatal',
     category: 'keluarga',
     readTime: '4 menit',
-    summary: 'Bagaimana pasangan dapat menjadi jangkar ketenangan melalui bantuan konkret dan sentuhan suportif.',
-    content: 'Ibu yang didukung penuh oleh pasangannya memiliki risiko depresi perinatal yang jauh lebih rendah. Dukungan paling nyata adalah berbagi tugas menjaga bayi di malam hari, menyiapkan makanan bergizi, dan memberikan telinga untuk mendengar tanpa langsung menghakimi atau menyalahkan.',
+    summary: 'Bagaimana pasangan dan keluarga dapat menjadi pelindung kesehatan mental ibu melalui tindakan konkret dan validasi rasa.',
+    content: `Kesehatan emosional ibu hamil dan pascasalin tidak dapat dipikul seorang diri. Penelitian membuktikan bahwa keterlibatan aktif pasangan mampu menurunkan risiko depresi pascasalin hingga lebih dari 60%.
+
+Seringkali suami ingin membantu namun bingung harus berbuat apa. Bantuan terbaik seringkali bukan berupa nasihat, melainkan kehadiran fisik dan pendengaran yang utuh:
+
+1. Validasi, Bukan Menghakimi: Hindari kalimat "Jangan sedih, kan anaknya sudah lahir sehat". Ganti dengan "Aku tahu kamu lelah sekali hari ini, terima kasih sudah berjuang luar biasa."
+2. Pembagian Tugas Malam Hari: Bergantian menggendong bayi saat sendawa atau mengganti popok agar ibu dapat tidur minimal 3–4 jam tanpa terputus.
+3. Menjaga Batasan dengan Tamu: Suami bertindak sebagai pelindung privasi ibu di minggu-minggu awal pascapersalinan agar ibu tidak terbebani oleh komentar yang memicu kecemasan (misal soal ASI atau bentuk tubuh).
+4. Sentuhan Kasih (Healing Touch): Pijatan lembut di tengkuk, bahu, atau telapak kaki saat ibu menyusui sangat efektif memicu pelepasan hormon oksitosin.`,
     reviewedBy: 'Dr. Ratna Indrawati, M.Kes',
-    publishedDate: '2026-08-20',
+    publishedDate: '2026-09-20',
+    tags: ['Keluarga', 'SuamiSiaga', 'HealingTouch', 'Komunikasi'],
+    status: 'published',
   },
   {
     id: 'art-03',
-    title: 'Kekuatan Mindfulness & Doa untuk Ketenangan Janin',
+    title: 'Kekuatan Mindfulness, Relaksasi & Doa untuk Janin',
     category: 'kehamilan',
     readTime: '3 menit',
-    summary: 'Hubungan neurohormonal antara ketenangan hati ibu hamil dan perkembangan janin di dalam kandungan.',
-    content: 'Saat ibu merasa tenang dan berzikir/berafirmasi positif, tubuh memproduksi hormon endorfin dan oksitosin yang melintasi plasenta. Janin dapat merasakan ketukan jantung ibu yang stabil dan ritmis, menciptakan rasa aman sejak dalam rahim.',
+    summary: 'Hubungan neurohormonal antara ketenangan hati ibu hamil dan pembentukan rasa aman janin di dalam rahim.',
+    content: `Saat ibu merasa tenang, damai, dan berzikir atau melantunkan doa syukur, tubuh memproduksi hormon endorfin dan oksitosin. Hormon kebahagiaan ini menembus plasenta dan mengirimkan sinyal rasa aman ke sistem saraf janin yang sedang bertumbuh.
+
+Sebaliknya, kecemasan kronis memicu pelepasan kortisol yang membuat denyut nadi janin ikut meningkat.
+
+Cara Sederhana Membangun Ketenangan Harian:
+- Tarik napas dalam melalui hidung selama 4 detik, tahan 4 detik, hembuskan perlahan 6 detik (SICRING Modul 1).
+- Letakkan kedua tangan di atas perut, rasakan gerakan hangat janin, dan sampaikan afirmasi cinta: "Nak, ibu bahagia menyambutmu, kita bertumbuh sehat bersama."
+- Bacalah doa ketenangan hati sebelum tidur. Ketenangan ibu adalah rumah pertama yang paling nyaman bagi buah hati.`,
     reviewedBy: 'Bdn. Nurhayati, S.Tr.Keb',
-    publishedDate: '2026-09-01',
+    publishedDate: '2026-09-28',
+    tags: ['Kehamilan', 'Mindfulness', 'Afirmasi', 'Relaksasi'],
+    status: 'published',
+  },
+  {
+    id: 'art-04',
+    title: 'Mengatasi Tokofobia & Kecemasan Menjelang Persalinan',
+    category: 'kehamilan',
+    readTime: '5 menit',
+    summary: 'Kiat praktis meredakan ketakutan akan rasa sakit persalinan melalui edukasi persalinan positif dan teknik napas.',
+    content: `Rasa takut menjelang persalinan adalah hal yang sangat manusiawi, terutama bagi ibu yang pertama kali melahirkan atau pernah mengalami trauma pada persalinan sebelumnya.
+
+Namun, ketakutan yang dibiarkan dapat memicu ketegangan otot panggul (Fear-Tension-Pain Cycle) yang justru memperlambat proses pembukaan jalan lahir.
+
+Kiat Mengubah Ketakutan Menjadi Keyakinan:
+1. Pahami Fisiologi Tubuh: Tubuh wanita secara alami dirancang mampu melahirkan. Rahim berkontraksi untuk membuka jalan, bukan untuk menyakiti.
+2. Buat Birth Plan yang Fleksibel: Diskusikan preferensi persalinan Anda dengan Bidan TPMB sejak trimester ketiga.
+3. Latihan Vokalisasi Hening & Napas Tiup: Mengeluarkan napas dengan desah lembut "haaa" membantu mengendurkan rahang dan dasar panggul.
+4. Kurangi Cerita Horor Persalinan: Lindungi pikiran Anda dari konsumsi video atau cerita persalinan traumatis di media sosial. Fokuslah pada afirmasi positif dan panduan resmi tenaga kesehatan.`,
+    reviewedBy: 'Bdn. Hj. Sri Wahyuni, S.ST, M.Keb',
+    publishedDate: '2026-10-01',
+    tags: ['Persalinan', 'Tokofobia', 'Trimester3', 'NapasMelahirkan'],
+    status: 'published',
+  },
+  {
+    id: 'art-05',
+    title: 'Manajemen Rasa Kewalahan (Overwhelmed) Merawat Bayi Baru Lahir',
+    category: 'psikologis',
+    readTime: '4 menit',
+    summary: 'Strategi psikologis saat ibu merasa lelah, kehilangan waktu untuk diri sendiri, dan dirundung rasa bersalah.',
+    content: `Menjadi ibu baru seringkali datang bersama paket kelelahan ekstrem: tangisan bayi yang sulit ditenangkan di jam 2 dini hari, puting lecet, cucian menumpuk, dan rasa bersalah karena merasa "tidak menikmati momen ini".
+
+Ingatlah satu hal penting: Merasa kewalahan bukan berarti Anda tidak mencintai bayi Anda. Itu hanya tanda bahwa kapasitas energi fisik dan mental Anda sedang habis.
+
+Pedoman Darurat Saat Mulai Panik:
+- Metode Jeda 2 Menit: Bila bayi terus menangis dan Anda merasa ingin marah atau putus asa, letakkan bayi dengan aman di tempat tidur, mundurlah beberapa langkah, lalu minum segelas air putih hangat sambil menarik napas dalam.
+- Lepaskan Standar Kesempurnaan: Rumah tidak harus rapi setiap hari. Makanan tidak harus selalu dimasak sendiri. Prioritas utama bulan pertama adalah pemulihan fisik ibu dan menyusui bayi.
+- Izinkan Diri Menerima Bantuan: Jangan tolak tawaran keluarga yang ingin membantu mencuci atau memasak. Menerima bantuan adalah bentuk kepedulian pada diri sendiri.`,
+    reviewedBy: 'Dr. Ratna Indrawati, M.Kes',
+    publishedDate: '2026-10-03',
+    tags: ['Psikologis', 'SelfCare', 'IbuBaru', 'RegulasiEmosi'],
+    status: 'published',
+  },
+  {
+    id: 'art-06',
+    title: 'Teknik Grounding 5-4-3-2-1 Saat Mengalami Serangan Panik',
+    category: 'relaksasi',
+    readTime: '3 menit',
+    summary: 'Metode cepat dan ampuh untuk mengembalikan kesadaran ke saat ini ketika pikiran dikuasai kecemasan.',
+    content: `Ketika serangan panik atau rasa cemas melanda, detak jantung berdegup kencang dan pikiran terasa berputar-putar. Teknik grounding 5-4-3-2-1 bekerja dengan mengalihkan fokus otak dari kecemasan internal ke panca indera eksternal di sekitar Anda.
+
+Langkah-langkah Praktik:
+1. Sebutkan 5 Benda yang Anda LIHAT (misal: bantal, jendela, jam dinding, tangan Anda, lantai).
+2. Sebutkan 4 Hal yang bisa Anda SENTUH/RASAKAN (misal: tekstur kain selimut, telapak kaki menapak di lantai, udara dingin AC, hangatnya kulit pipi).
+3. Sebutkan 3 Suara yang Anda DENGAR (misal: deru kipas, suara kicau burung, tarikan napas Anda sendiri).
+4. Sebutkan 2 Bau yang Anda CIUM (misal: minyak telon bayi, wangi teh, aroma bantal).
+5. Rasakan 1 Rasa di LIDAH Anda (misal: sisa rasa air putih, atau telan ludah dengan sadar).
+
+Tutup dengan satu tarikan napas panjang dan ucapkan: "Saat ini saya aman, tubuh saya kuat, dan perasaan cemas ini akan segera berlalu."`,
+    reviewedBy: 'Bdn. Nurhayati, S.Tr.Keb',
+    publishedDate: '2026-10-05',
+    tags: ['Relaksasi', 'Grounding', 'Kecemasan', 'Panik'],
+    status: 'published',
   },
 ];
 

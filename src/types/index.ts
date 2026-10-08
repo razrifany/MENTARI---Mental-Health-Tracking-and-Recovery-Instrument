@@ -151,12 +151,15 @@ export interface ConsultationRequest {
 export interface EducationalArticle {
   id: string;
   title: string;
-  category: 'kehamilan' | 'nifas' | 'psikologis' | 'keluarga';
+  category: 'kehamilan' | 'nifas' | 'psikologis' | 'keluarga' | 'relaksasi';
   readTime: string;
   summary: string;
   content: string;
   reviewedBy: string;
   publishedDate: string;
+  imageUrl?: string;
+  tags?: string[];
+  status?: 'published' | 'draft';
 }
 
 export interface AuditLog {

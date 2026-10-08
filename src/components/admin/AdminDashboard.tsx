@@ -37,6 +37,7 @@ import { User, FollowUpCase, UserRole } from '../../types';
 import { BidanPatientDetailModal } from './BidanPatientDetailModal';
 import { RegisterMotherModal } from './RegisterMotherModal';
 import { AhliMateriSicringView } from './AhliMateriSicringView';
+import { AhliMateriArticlesView } from './AhliMateriArticlesView';
 import { PenelitiPortalView } from './PenelitiPortalView';
 import { AdminPortalView } from './AdminPortalView';
 import { TpmbClinicalDashboard } from './TpmbClinicalDashboard';
@@ -52,6 +53,7 @@ export type AdminDashboardTab =
   | 'pasien'
   | 'pendampingan'
   | 'panduan_sicring'
+  | 'materi_edukasi'
   | 'riset'
   | 'ambang'
   | 'pengguna'
@@ -60,7 +62,7 @@ export type AdminDashboardTab =
 // Role-based allowed tabs definition
 const ROLE_PERMISSIONS: Record<UserRole, AdminDashboardTab[]> = {
   bidan: ['dashboard', 'anc', 'pasien', 'pendampingan'],
-  ahli_materi: ['panduan_sicring'],
+  ahli_materi: ['panduan_sicring', 'materi_edukasi'],
   peneliti: ['dashboard', 'riset', 'ambang'],
   admin: ['pengguna', 'audit'],
   ibu: ['dashboard'], // fallback
@@ -78,6 +80,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
     thresholdConfig,
     auditLogs,
     ancVisits,
+    articles,
     loginAs,
     logout,
     updateConsultationStatus,
@@ -217,13 +220,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
       badgeColor: 'bg-amber-500 text-white',
       roles: ['bidan'],
     },
-    // Ahli Materi SICRING item
+    // Ahli Materi SICRING & Edukasi items
     {
       id: 'panduan_sicring' as const,
       label: 'Kelola Panduan SICRING',
-      icon: BookOpen,
+      icon: Sparkles,
       badge: '5 Modul',
       badgeColor: 'bg-purple-100 text-purple-800',
+      roles: ['ahli_materi'],
+    },
+    {
+      id: 'materi_edukasi' as const,
+      label: 'Materi & Artikel Edukasi',
+      icon: BookOpen,
+      badge: `${articles.length} Materi`,
+      badgeColor: 'bg-indigo-100 text-indigo-800',
       roles: ['ahli_materi'],
     },
     // Peneliti items
@@ -314,6 +325,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
         return 'Jadwal Konsultasi & Pendampingan';
       case 'panduan_sicring':
         return 'Pengelolaan Panduan SICRING (Video, Audio, Teks)';
+      case 'materi_edukasi':
+        return 'Penyusunan & Pengelolaan Materi Edukasi Kesehatan Jiwa Perinatal';
       case 'riset':
         return 'Modul Analisis Riset & Ekspor Data';
       case 'ambang':
@@ -598,10 +611,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
         {/* Main Content Area */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
           {/* ========================================================
-              ROLE 1: AHLI MATERI SICRING
-              Halaman kelola panduan sicring (video, audio, teks)
+              ROLE 1: AHLI MATERI SICRING & KESEHATAN MENTAL
+              Halaman kelola panduan sicring (video, audio, teks) &
+              Halaman kelola materi/artikel edukasi kesehatan mental
           ======================================================== */}
-          {userRole === 'ahli_materi' && <AhliMateriSicringView />}
+          {userRole === 'ahli_materi' && (
+            <>
+              {activeTab === 'panduan_sicring' && (
+                <AhliMateriSicringView
+                  onSwitchToArticles={() => setActiveTab('materi_edukasi')}
+                />
+              )}
+              {activeTab === 'materi_edukasi' && (
+                <AhliMateriArticlesView
+                  onSwitchToSicring={() => setActiveTab('panduan_sicring')}
+                />
+              )}
+            </>
+          )}
 
           {/* ========================================================
               ROLE 2: PENELITI

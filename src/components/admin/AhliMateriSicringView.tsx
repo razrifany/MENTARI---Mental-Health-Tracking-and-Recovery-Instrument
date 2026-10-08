@@ -28,8 +28,15 @@ import {
   SicringDetailedGuide,
 } from '../../data/sicringGuides';
 
-export const AhliMateriSicringView: React.FC = () => {
+interface AhliMateriSicringViewProps {
+  onSwitchToArticles?: () => void;
+}
+
+export const AhliMateriSicringView: React.FC<AhliMateriSicringViewProps> = ({
+  onSwitchToArticles,
+}) => {
   const {
+    articles,
     sicringDetailedGuides,
     sicringTextGuides,
     updateSicringDetailedGuide,
@@ -183,6 +190,28 @@ export const AhliMateriSicringView: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Top Hub Navigation for Ahli Materi */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <button
+          type="button"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-xs cursor-pointer"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>Panduan Intervensi SICRING (5 Modul)</span>
+        </button>
+
+        {onSwitchToArticles && (
+          <button
+            type="button"
+            onClick={onSwitchToArticles}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+          >
+            <BookOpen className="w-4 h-4 text-purple-600" />
+            <span>Materi Edukasi Kesehatan Mental ({articles.length})</span>
+          </button>
+        )}
+      </div>
+
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-purple-800 via-purple-700 to-indigo-700 rounded-3xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

@@ -84,6 +84,10 @@ interface AppContextType {
   updateUserRole: (userId: string, newRole: UserRole) => void;
   addAncVisit: (data: Omit<AncVisitRecord, 'id'>) => AncVisitRecord;
   updateAncVisit: (id: string, data: Partial<AncVisitRecord>) => void;
+  addArticle: (data: Omit<EducationalArticle, 'id'>) => EducationalArticle;
+  updateArticle: (id: string, data: Partial<EducationalArticle>) => void;
+  deleteArticle: (id: string) => void;
+  resetArticlesToDefault: () => void;
   updateThresholdConfig: (newConfig: Partial<ThresholdConfig>) => void;
   exportResearchData: () => void;
   addAuditLog: (action: string, details: string) => void;
@@ -139,7 +143,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_CONSULTATIONS;
   });
 
-  const [articles] = useState<EducationalArticle[]>(INITIAL_ARTICLES);
+  const [articles, setArticles] = useState<EducationalArticle[]>(() => {
+    const saved = localStorage.getItem(`${STORAGE_KEY_PREFIX}articles`);
+    return saved ? JSON.parse(saved) : INITIAL_ARTICLES;
+  });
 
   const [thresholdConfig, setThresholdConfig] = useState<ThresholdConfig>(() => {
     const saved = localStorage.getItem(`${STORAGE_KEY_PREFIX}thresholds`);
@@ -160,6 +167,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY_PREFIX}current_user`, JSON.stringify(currentUser));
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}articles`, JSON.stringify(articles));
+  }, [articles]);
 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY_PREFIX}anc_visits`, JSON.stringify(ancVisits));
@@ -693,6 +704,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const addArticle = (data: Omit<EducationalArticle, 'id'>): EducationalArticle => {
+    const newArticle: EducationalArticle = {
+      ...data,
+      id: `art-${Date.now()}`,
+    };
+    setArticles((prev) => [newArticle, ...prev]);
+    addAuditLog(
+      'Materi Edukasi Baru Ditambahkan',
+      `Ahli Materi (${currentUser?.name || 'Ahli Materi'}) menambahkan artikel baru: "${data.title}" [Kategori: ${data.category.toUpperCase()}]`
+    );
+    return newArticle;
+  };
+
+  const updateArticle = (id: string, data: Partial<EducationalArticle>) => {
+    setArticles((prev) =>
+      prev.map((art) => (art.id === id ? { ...art, ...data } : art))
+    );
+    addAuditLog(
+      'Pembaruan Materi Edukasi',
+      `Materi edukasi "${data.title || id}" diperbarui oleh ${currentUser?.name || 'Ahli Materi'}`
+    );
+  };
+
+  const deleteArticle = (id: string) => {
+    const target = articles.find((a) => a.id === id);
+    setArticles((prev) => prev.filter((art) => art.id !== id));
+    addAuditLog(
+      'Penghapusan Materi Edukasi',
+      `Materi "${target?.title || id}" dihapus dari sistem oleh ${currentUser?.name || 'Ahli Materi'}`
+    );
+  };
+
+  const resetArticlesToDefault = () => {
+    setArticles(INITIAL_ARTICLES);
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}articles`, JSON.stringify(INITIAL_ARTICLES));
+    addAuditLog(
+      'Reset Materi Edukasi ke Standar Baku',
+      `Semua materi edukasi kesehatan mental dikembalikan ke ${INITIAL_ARTICLES.length} modul kurikulum standar`
+    );
+  };
+
   const updateThresholdConfig = (newConfig: Partial<ThresholdConfig>) => {
     setThresholdConfig((prev) => {
       const updated = {
@@ -763,6 +815,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateUserRole,
         addAncVisit,
         updateAncVisit,
+        addArticle,
+        updateArticle,
+        deleteArticle,
+        resetArticlesToDefault,
         updateThresholdConfig,
         exportResearchData,
         addAuditLog,
