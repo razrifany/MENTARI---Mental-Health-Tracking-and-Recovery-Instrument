@@ -42,7 +42,7 @@ import {
 
 interface SicringModuleViewProps {
   onOpenConsultationModal: () => void;
-  onDetailModeChange?: (isDetail: boolean) => void;
+  onDetailModeChange?: (isDetail: boolean, title?: string) => void;
   isDetailActive?: boolean;
 }
 
@@ -70,7 +70,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
   // Sync with parent layout header back button & full page detail state
   useEffect(() => {
     if (onDetailModeChange) {
-      onDetailModeChange(activeMode === 'panduan');
+      onDetailModeChange(activeMode === 'panduan', activeMode === 'panduan' ? 'Panduan SICRING' : undefined);
     }
   }, [activeMode, onDetailModeChange]);
 

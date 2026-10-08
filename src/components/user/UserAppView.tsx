@@ -44,18 +44,31 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
   const [activeTab, setActiveTab] = useState<'beranda' | 'latihan' | 'anc' | 'edukasi' | 'riwayat' | 'profil' | 'bantuan'>('beranda');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isChildDetailActive, setIsChildDetailActive] = useState(false);
+  const [childDetailTitle, setChildDetailTitle] = useState<string | null>(null);
 
   // Reset child detail state when tab changes
   React.useEffect(() => {
     setIsChildDetailActive(false);
+    setChildDetailTitle(null);
   }, [activeTab]);
+
+  const handleDetailModeChange = (isDetail: boolean, title?: string) => {
+    setIsChildDetailActive(isDetail);
+    if (isDetail && title) {
+      setChildDetailTitle(title);
+    } else if (!isDetail) {
+      setChildDetailTitle(null);
+    }
+  };
 
   const isFullDetailPage = activeTab === 'bantuan' || isChildDetailActive;
 
   const getDetailTitle = () => {
+    if (childDetailTitle) return childDetailTitle;
     if (activeTab === 'bantuan') return 'Bantuan Bidan';
     if (activeTab === 'latihan') return 'Panduan SICRING';
     if (activeTab === 'edukasi') return 'Detail Artikel';
+    if (activeTab === 'profil') return 'Detail Profil';
     return 'Detail Halaman';
   };
 
@@ -64,6 +77,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
       setActiveTab('beranda');
     } else {
       setIsChildDetailActive(false);
+      setChildDetailTitle(null);
     }
   };
 
@@ -72,7 +86,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
   const [screeningResult, setScreeningResult] = useState<EPDSScreeningResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
-  const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
 
   const currentTpmb = tpmbList.find((t) => t.id === currentUser?.tpmbId) || tpmbList[0];
 
@@ -96,7 +110,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
   const userNavItems = [
     {
       id: 'beranda' as const,
-      label: 'Beranda & Skrining',
+      label: 'Beranda',
       icon: Home,
       action: () => {
         setActiveTab('beranda');
@@ -105,7 +119,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
     },
     {
       id: 'latihan' as const,
-      label: 'Modul SICRING (5)',
+      label: 'Modul SICRING',
       icon: Heart,
       action: () => {
         setActiveTab('latihan');
@@ -114,7 +128,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
     },
     {
       id: 'anc' as const,
-      label: isPregnant ? 'Layanan ANC & Riwayat' : 'Layanan PNC & Riwayat',
+      label: isPregnant ? 'Layanan ANC' : 'Layanan PNC',
       icon: HeartHandshake,
       action: () => {
         setActiveTab('anc');
@@ -123,7 +137,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
     },
     {
       id: 'edukasi' as const,
-      label: 'Edukasi Kesehatan Jiwa',
+      label: 'Materi Edukasi',
       icon: BookOpen,
       action: () => {
         setActiveTab('edukasi');
@@ -132,7 +146,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
     },
     {
       id: 'profil' as const,
-      label: 'Profil & Persetujuan',
+      label: 'Profil Saya',
       icon: UserIcon,
       action: () => {
         setActiveTab('profil');
@@ -141,7 +155,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
     },
     {
       id: 'bantuan' as const,
-      label: 'Bantuan Bidan 24 Jam',
+      label: 'Bantuan Bidan',
       icon: Phone,
       action: () => {
         setActiveTab('bantuan');
@@ -687,7 +701,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                     <div
                       key={art.id}
                       onClick={() => {
-                        setSelectedArticle(art);
+                        setSelectedArticleId(art.id);
+                        setActiveTab('edukasi');
                       }}
                       className="p-3.5 bg-slate-50/80 hover:bg-sky-50/70 rounded-2xl border border-slate-200/80 hover:border-sky-200 cursor-pointer transition-colors flex flex-col justify-between"
                     >
@@ -722,7 +737,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
           {activeTab === 'latihan' && (
             <SicringModuleView
               onOpenConsultationModal={() => setIsConsultationOpen(true)}
-              onDetailModeChange={setIsChildDetailActive}
+              onDetailModeChange={handleDetailModeChange}
               isDetailActive={isChildDetailActive}
             />
           )}
@@ -739,8 +754,10 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
             <UserMentalEducationView
               onStartScreening={() => setIsScreeningOpen(true)}
               onGoToSicring={() => setActiveTab('latihan')}
-              onDetailModeChange={setIsChildDetailActive}
+              onDetailModeChange={handleDetailModeChange}
               isDetailActive={isChildDetailActive}
+              initialArticleId={selectedArticleId}
+              onClearInitialArticle={() => setSelectedArticleId(null)}
             />
           )}
 
@@ -748,6 +765,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
             <UserProfileView
               onBackToHome={() => setActiveTab('beranda')}
               onSwitchToAdmin={onSwitchToAdmin}
+              onDetailModeChange={handleDetailModeChange}
+              isDetailActive={isChildDetailActive}
             />
           )}
 
@@ -847,35 +866,6 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
         isOpen={isConsultationOpen}
         onClose={() => setIsConsultationOpen(false)}
       />
-
-      {/* Article Detail Modal */}
-      {selectedArticle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-sky-100 p-6 text-slate-800 flex flex-col max-h-[85vh]">
-            <span className="text-[10px] font-bold uppercase text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md self-start">
-              {selectedArticle.category} &bull; {selectedArticle.readTime}
-            </span>
-            <h3 className="font-bold text-slate-900 text-base mt-2">{selectedArticle.title}</h3>
-            <span className="text-[11px] text-slate-400 mt-0.5">
-              Ditinjau oleh: {selectedArticle.reviewedBy}
-            </span>
-
-            <div className="my-4 overflow-y-auto text-xs text-slate-700 leading-relaxed space-y-3">
-              <p>{selectedArticle.content}</p>
-              <div className="bg-sky-50 border border-sky-100 rounded-2xl p-3 text-sky-900">
-                <strong>Tips Bidan:</strong> Luangkan waktu 10 menit setiap hari untuk duduk tenang, bernapas wajar, dan berbincang dengan pendamping.
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedArticle(null)}
-              className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-colors"
-            >
-              Tutup Artikel
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
