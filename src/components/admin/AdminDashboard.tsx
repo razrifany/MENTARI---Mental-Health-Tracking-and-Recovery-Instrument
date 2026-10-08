@@ -101,6 +101,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
   }, [userRole, allowedTabs, activeTab]);
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Selected patient for modal
   const [selectedPatient, setSelectedPatient] = useState<User | null>(null);
@@ -352,11 +353,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
 
       {/* Responsive Left Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-200 ease-in-out lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex flex-col h-full h-screen overflow-y-auto">
           {/* Sidebar Brand Header */}
           <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -385,59 +386,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
             >
               <X className="w-5 h-5" />
             </button>
-          </div>
-
-          {/* Quick Role Switcher (Simulasi Uji Hak Akses) */}
-          <div className="px-4 py-3 bg-slate-50/70 border-b border-slate-100">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-              Simulasi Uji Peran Sistem
-            </span>
-            <div className="grid grid-cols-2 gap-1.5 bg-slate-200/60 p-1.5 rounded-xl text-[11px] font-semibold">
-              <button
-                onClick={() => loginAs('user-bidan-1')}
-                className={`py-1.5 px-2 text-center rounded-lg transition-all ${
-                  userRole === 'bidan'
-                    ? 'bg-white text-sky-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Bidan TPMB: Dashboard, Triase, Pasien, Jadwal Konsultasi"
-              >
-                🩺 Bidan
-              </button>
-              <button
-                onClick={() => loginAs('user-ahli-materi-1')}
-                className={`py-1.5 px-2 text-center rounded-lg transition-all ${
-                  userRole === 'ahli_materi'
-                    ? 'bg-white text-purple-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Ahli Materi SICRING: Kelola Video, Audio, Teks Panduan"
-              >
-                🧘‍♀️ Ahli Materi
-              </button>
-              <button
-                onClick={() => loginAs('user-peneliti-1')}
-                className={`py-1.5 px-2 text-center rounded-lg transition-all ${
-                  userRole === 'peneliti'
-                    ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Peneliti: Dashboard Multi-TPMB, Riset, Ekspor CSV, Ambang EPDS"
-              >
-                🔬 Peneliti
-              </button>
-              <button
-                onClick={() => loginAs('user-admin-1')}
-                className={`py-1.5 px-2 text-center rounded-lg transition-all ${
-                  userRole === 'admin'
-                    ? 'bg-white text-slate-900 shadow-xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Admin: Kelola Pengguna, Hak Akses, Log Audit Sistem"
-              >
-                🛡️ Admin
-              </button>
-            </div>
           </div>
 
           {/* Navigation Menu Links (Filtered by Role Permissions) */}
@@ -501,7 +449,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
             )}
           </div>
 
-          {/* User Info & Bottom Controls */}
+          {/* User Info & Bottom Controls (Single Keluar Button) */}
           <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-2">
             <div className="flex items-center gap-2.5 px-2 py-1.5">
               <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
@@ -523,21 +471,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="pt-1">
               <button
-                onClick={onSwitchToUser}
-                className="flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-colors"
-                title="Buka tampilan aplikasi untuk pasien / ibu"
+                type="button"
+                onClick={() => setShowLogoutModal(true)}
+                className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300/80 py-2.5 px-3 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Aplikasi Ibu</span>
-              </button>
-
-              <button
-                onClick={logout}
-                className="flex items-center justify-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-100 py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-colors"
-              >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4 text-slate-600" />
                 <span>Keluar</span>
               </button>
             </div>
@@ -548,7 +488,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
       {/* Main Workspace on the Right */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Top Header of Main Workspace */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between shadow-2xs">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 py-4 sm:py-4.5 flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-3 min-w-0">
             {/* Hamburger button for mobile */}
             <button
@@ -560,19 +500,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
             </button>
 
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-                  {getTabTitle()}
-                </h2>
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border hidden sm:inline-block ${roleInfo.badgeBg}`}
-                >
-                  {roleInfo.badgeText}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 hidden sm:block">
-                {currentTpmb.name} &bull; {roleInfo.desc}
-              </p>
+              <h2 className="text-base sm:text-lg font-semibold text-slate-800 leading-tight">
+                {getTabTitle()}
+              </h2>
             </div>
           </div>
 
@@ -597,14 +527,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
                 <span>Daftarkan Ibu</span>
               </button>
             )}
-
-            <button
-              onClick={onSwitchToUser}
-              className="bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold px-3 py-1.5 rounded-xl border border-sky-200 text-xs flex items-center gap-1.5 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Mode Ibu</span>
-            </button>
           </div>
         </header>
 
@@ -670,6 +592,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
                   mode="bidan"
                   initialTpmbId={currentTpmb.id}
                   onOpenPatientDetail={(patient) => setSelectedPatient(patient)}
+                  onNavigateToPatients={(riskFilter) => {
+                    setFilterRisk(riskFilter);
+                    setActiveTab('pasien');
+                  }}
                 />
               )}
 
@@ -1137,6 +1063,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchToUser }
         isOpen={isRegisterOpen}
         onClose={() => setIsRegisterOpen(false)}
       />
+
+      {/* Modal Konfirmasi Keluar (Yakin Keluar?) */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto font-bold border border-slate-200 shadow-2xs">
+              <LogOut className="w-6 h-6 text-slate-700" />
+            </div>
+
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                YAKIN KELUAR?
+              </h3>
+              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                Apakah Anda yakin ingin keluar dari akun <strong>{currentUser?.name}</strong>? Sesi Anda akan diakhiri.
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs border border-slate-200 transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  logout();
+                }}
+                className="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors shadow-2xs cursor-pointer"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -112,7 +112,7 @@ export const UserAncHistoryView: React.FC<UserAncHistoryViewProps> = ({
         location: currentTpmb.name,
         midwife: currentTpmb.midwifeName,
         status: 'Jadwal Terencana',
-        statusColor: 'bg-emerald-100 text-emerald-800',
+        statusColor: 'bg-sky-100 text-sky-800',
         notes: 'Pemeriksaan involusi uteri, evaluasi penyembuhan luka perineum, pemantauan laktasi ASI, dan konseling batin.',
         isCustom: false,
       };
@@ -255,158 +255,74 @@ export const UserAncHistoryView: React.FC<UserAncHistoryViewProps> = ({
         </div>
       )}
 
-      {/* 1. POSISI PALING ATAS: JADWAL KUNJUNGAN TERDEKAT (BISA DILIHAT DETAIL) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-sky-300 shadow-sm relative overflow-hidden bg-gradient-to-br from-white via-sky-50/30 to-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-500 text-white flex items-center justify-center font-bold shadow-xs">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">
-                  Jadwal Kunjungan Terdekat
-                </span>
-                <span className="text-[10px] font-medium text-slate-400">
-                  {isPregnant ? 'Pemeriksaan Rutin ANC' : 'Kunjungan Masa Nifas (PNC)'}
-                </span>
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
-                {upcomingVisitInfo.title}
-              </h3>
-            </div>
-          </div>
+      {/* 1. POSISI PALING ATAS: JADWAL KUNJUNGAN TERDEKAT - Clean Solid Sky 500 Card */}
+      <div className="bg-sky-500 text-white rounded-3xl p-4.5 sm:p-5 shadow-sm shadow-sky-200/50 relative overflow-hidden space-y-3.5">
+        <div className="flex items-center justify-between gap-2 border-b border-white/20 pb-2.5">
+          <span className="text-xs font-bold text-white bg-white/20 px-3 py-1 rounded-full border border-white/30 backdrop-blur-xs whitespace-nowrap">
+            {isPregnant ? 'Pemeriksaan ANC' : 'Kunjungan Nifas'}
+          </span>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${upcomingVisitInfo.statusColor}`}>
-              {upcomingVisitInfo.status}
-            </span>
-          </div>
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-white text-sky-800 shadow-2xs whitespace-nowrap">
+            {upcomingVisitInfo.status}
+          </span>
         </div>
 
-        {/* Visit Information Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4 text-xs text-slate-700">
-          <div className="p-3.5 bg-white/90 rounded-2xl border border-sky-100 flex items-start gap-3 shadow-2xs">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Waktu Kunjungan</span>
-              <span className="font-bold text-slate-900 block mt-0.5">{upcomingVisitInfo.date}</span>
-              <span className="text-[11px] text-sky-700 font-medium">{upcomingVisitInfo.time}</span>
-            </div>
+        <div>
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+            {upcomingVisitInfo.title}
+          </h3>
+        </div>
+
+        {/* Compact Info Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/25">
+            <span className="text-[10px] font-bold text-sky-100 block uppercase">Waktu Kunjungan</span>
+            <span className="font-bold text-white block mt-0.5">{upcomingVisitInfo.date}</span>
+            <span className="text-[11px] text-sky-100 block">{upcomingVisitInfo.time}</span>
           </div>
 
-          <div className="p-3.5 bg-white/90 rounded-2xl border border-sky-100 flex items-start gap-3 shadow-2xs">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Tempat / Fasilitas</span>
-              <span className="font-bold text-slate-900 block mt-0.5 truncate">{upcomingVisitInfo.location}</span>
-              <span className="text-[11px] text-slate-500 truncate block">{currentTpmb.address}</span>
-            </div>
+          <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/25">
+            <span className="text-[10px] font-bold text-sky-100 block uppercase">Fasilitas</span>
+            <span className="font-bold text-white block mt-0.5 truncate">{upcomingVisitInfo.location}</span>
+            <span className="text-[11px] text-sky-100 block truncate">{currentTpmb.address}</span>
           </div>
 
-          <div className="p-3.5 bg-white/90 rounded-2xl border border-sky-100 flex items-start gap-3 shadow-2xs">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-              <User className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Bidan Pembina</span>
-              <span className="font-bold text-slate-900 block mt-0.5 truncate">{upcomingVisitInfo.midwife}</span>
-              <span className="text-[11px] text-slate-500">{currentTpmb.phone}</span>
-            </div>
+          <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/25 sm:col-span-1">
+            <span className="text-[10px] font-bold text-sky-100 block uppercase">Bidan Pembina</span>
+            <span className="font-bold text-white block mt-0.5 truncate">{upcomingVisitInfo.midwife}</span>
+            <span className="text-[11px] text-sky-100 block">{currentTpmb.phone}</span>
           </div>
         </div>
 
         {/* Note snippet */}
-        <div className="mt-3.5 p-3.5 bg-sky-50/70 rounded-2xl border border-sky-100 text-xs text-sky-950 flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-          <p className="leading-relaxed text-[11px] sm:text-xs">
+        <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/25 text-xs text-sky-50 flex items-start gap-2">
+          <Info className="w-4 h-4 text-white shrink-0 mt-0.5" />
+          <p className="leading-relaxed text-[11px]">
             <strong>Fokus Pemeriksaan:</strong> {upcomingVisitInfo.notes}
           </p>
         </div>
 
-        {/* Footer Actions of Upcoming Visit */}
-        <div className="mt-4 pt-3.5 border-t border-sky-100 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-[11px] text-slate-500">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Harap membawa Buku KIA saat datang ke klinik TPMB.</span>
-          </div>
+        {/* Footer Actions */}
+        <div className="pt-1 flex items-center gap-2">
+          <button
+            onClick={() => setIsDetailModalOpen(true)}
+            className="flex-1 bg-white hover:bg-sky-50 text-sky-700 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer text-center"
+          >
+            <FileText className="w-4 h-4 text-sky-600" />
+            <span>Detail Kunjungan</span>
+          </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsDetailModalOpen(true)}
-              className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors flex items-center gap-1.5 shadow-xs shadow-sky-200"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Lihat Detail Kunjungan</span>
-            </button>
-            <button
-              onClick={onOpenConsultationModal}
-              className="bg-white hover:bg-slate-50 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs border border-slate-200 transition-colors flex items-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Ubah / Buat Jadwal Baru</span>
-            </button>
-          </div>
+          <button
+            onClick={onOpenConsultationModal}
+            className="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs border border-white/30 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Ubah / Buat Jadwal</span>
+          </button>
         </div>
       </div>
 
-      {/* 2. BAGIAN PENGATURAN NOTIFIKASI PENGINGAT (Tepat di bawah Jadwal Terdekat) */}
-      <div className="bg-gradient-to-r from-sky-50 via-white to-sky-50 border border-sky-200/80 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-start gap-3.5">
-          <div
-            className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
-              isNotificationEnabled
-                ? 'bg-sky-600 text-white shadow-xs shadow-sky-200'
-                : 'bg-slate-100 text-slate-400'
-            }`}
-          >
-            {isNotificationEnabled ? <BellRing className="w-5 h-5 animate-pulse" /> : <Bell className="w-5 h-5" />}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-bold text-slate-900 text-sm">
-                Pengingat Notifikasi Jadwal & Skrining
-              </h4>
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isNotificationEnabled
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {isNotificationEnabled ? 'Aktif' : 'Nonaktif'}
-              </span>
-            </div>
-            <p className="text-xs text-slate-600 mt-0.5 leading-relaxed max-w-lg">
-              Kirimkan pengingat otomatis pada <strong>H-1</strong> dan <strong>2 jam sebelum kunjungan</strong> melalui notifikasi aplikasi serta WhatsApp ke {currentUser?.phone || 'nomor terdaftar'}.
-            </p>
-          </div>
-        </div>
 
-        {/* Notification Toggle Switch */}
-        <button
-          type="button"
-          onClick={handleToggleNotification}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-95 shrink-0 ${
-            isNotificationEnabled
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-          }`}
-        >
-          <span>{isNotificationEnabled ? 'Notifikasi Aktif' : 'Aktifkan Pengingat'}</span>
-          <div
-            className={`w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
-              isNotificationEnabled ? 'bg-white text-emerald-600' : 'bg-transparent'
-            }`}
-          >
-            {isNotificationEnabled && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
-          </div>
-        </button>
-      </div>
 
       {/* 3. RINGKASAN STATUS IBU & METRIK TERPADU */}
       <div className="bg-white border border-sky-100 rounded-3xl p-5 sm:p-6 shadow-2xs">

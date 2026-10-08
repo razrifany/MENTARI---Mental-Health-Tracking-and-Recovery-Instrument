@@ -9,6 +9,7 @@ import {
   Sparkles,
   BookOpen,
   ArrowRight,
+  ArrowLeft,
   Shield,
   HeartPulse,
   LayoutDashboard,
@@ -30,6 +31,7 @@ import { UserAncHistoryView } from './UserAncHistoryView';
 import { UserConsultationModal } from './UserConsultationModal';
 import { UserProfileView } from './UserProfileView';
 import { EmergencyHelpModal } from './EmergencyHelpModal';
+import { EmergencyHelpView } from './EmergencyHelpView';
 import { UserMentalEducationView } from './UserMentalEducationView';
 
 interface UserAppViewProps {
@@ -39,14 +41,36 @@ interface UserAppViewProps {
 export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => {
   const { currentUser, tpmbList, articles, cases, screenings, logout } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'beranda' | 'latihan' | 'anc' | 'edukasi' | 'riwayat' | 'profil'>('beranda');
+  const [activeTab, setActiveTab] = useState<'beranda' | 'latihan' | 'anc' | 'edukasi' | 'riwayat' | 'profil' | 'bantuan'>('beranda');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isChildDetailActive, setIsChildDetailActive] = useState(false);
+
+  // Reset child detail state when tab changes
+  React.useEffect(() => {
+    setIsChildDetailActive(false);
+  }, [activeTab]);
+
+  const isFullDetailPage = activeTab === 'bantuan' || isChildDetailActive;
+
+  const getDetailTitle = () => {
+    if (activeTab === 'bantuan') return 'Bantuan Bidan';
+    if (activeTab === 'latihan') return 'Panduan SICRING';
+    if (activeTab === 'edukasi') return 'Detail Artikel';
+    return 'Detail Halaman';
+  };
+
+  const handleHeaderBack = () => {
+    if (activeTab === 'bantuan') {
+      setActiveTab('beranda');
+    } else {
+      setIsChildDetailActive(false);
+    }
+  };
 
   // Modals state
   const [isScreeningOpen, setIsScreeningOpen] = useState(false);
   const [screeningResult, setScreeningResult] = useState<EPDSScreeningResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
-  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
 
@@ -115,6 +139,15 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
         setIsMobileSidebarOpen(false);
       },
     },
+    {
+      id: 'bantuan' as const,
+      label: 'Bantuan Bidan 24 Jam',
+      icon: Phone,
+      action: () => {
+        setActiveTab('bantuan');
+        setIsMobileSidebarOpen(false);
+      },
+    },
   ];
 
   const getSectionTitle = () => {
@@ -147,11 +180,11 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
 
       {/* Responsive Left Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-sky-100 flex flex-col justify-between transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-sky-100 flex flex-col justify-between transition-transform duration-200 ease-in-out lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex flex-col h-full h-screen overflow-y-auto">
           {/* Brand & Clinic Info */}
           <div className="p-4 sm:p-5 border-b border-sky-100/80 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -259,7 +292,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                 </p>
                 <button
                   onClick={() => {
-                    setIsEmergencyOpen(true);
+                    setActiveTab('bantuan');
                     setIsMobileSidebarOpen(false);
                   }}
                   className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs transition-colors shadow-2xs flex items-center justify-center gap-1.5"
@@ -298,58 +331,47 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
       {/* Main Workspace on the Right */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Sticky App Header */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-sky-100 px-4 py-3 sm:px-6 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* Mobile menu hamburger button */}
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200/70 px-4 py-3 sm:px-6">
+          {isFullDetailPage ? (
+            /* Detail Header: Back button on left (no border, no shadow), Title centered */
+            <div className="flex items-center justify-between">
               <button
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
-                title="Buka Menu Sidebar"
+                type="button"
+                onClick={handleHeaderBack}
+                className="w-9 h-9 rounded-full hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                title="Kembali"
               >
-                <Menu className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 text-slate-800" />
               </button>
 
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-                  {getSectionTitle()}
-                </h2>
-                <p className="text-xs text-slate-500 hidden sm:block">
-                  {isPregnant
-                    ? `Fase Kehamilan: Usia ${gestationalWeeks} Minggu · HPL: ${currentUser?.hpl || '12 Jan 2027'}`
-                    : `Fase Nifas: Hari ke-${postpartumDays} Pasca Persalinan`}
-                </p>
+              <h1 className="font-semibold text-slate-900 text-base sm:text-lg tracking-tight text-center">
+                {getDetailTitle()}
+              </h1>
+
+              {/* Spacer for 3-column symmetry */}
+              <div className="w-9 h-9"></div>
+            </div>
+          ) : (
+            /* Default Dashboard Header */
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-black text-sm shadow-xs">
+                  M
+                </div>
+                <span className="font-bold text-slate-800 text-sm tracking-tight">MENTARI</span>
               </div>
-            </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-2">
-              {/* Emergency SOS Button */}
+              {/* Minimalist Blue Outline Bantuan Bidan button on top right header */}
               <button
                 type="button"
-                onClick={() => setIsEmergencyOpen(true)}
-                className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
-                title="Bantuan Darurat Psikologis & Telepon Bidan"
+                onClick={() => setActiveTab('bantuan')}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-sky-50 text-sky-600 border border-sky-300 shadow-2xs hover:shadow-xs flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                title="Bantuan Darurat Psikologis & Telepon Bidan 24 Jam"
               >
-                <Phone className="w-3.5 h-3.5 text-rose-600" />
-                <span className="font-semibold text-xs">Bantuan Bidan</span>
-              </button>
-
-              {/* Profile button */}
-              <button
-                type="button"
-                onClick={() => setActiveTab('profil')}
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all font-bold text-xs ${
-                  activeTab === 'profil'
-                    ? 'bg-sky-600 text-white ring-2 ring-sky-300 shadow-xs'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                }`}
-                title="Profil & Lembar Persetujuan (Informed Consent)"
-              >
-                {currentUser?.name ? currentUser.name.charAt(0) : <UserIcon className="w-4 h-4" />}
+                <Phone className="w-4.5 h-4.5 text-sky-600" />
               </button>
             </div>
-          </div>
+          )}
         </header>
 
         {/* Emergency Alert Banner if Case is Active */}
@@ -362,7 +384,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
               </span>
             </div>
             <button
-              onClick={() => setIsEmergencyOpen(true)}
+              onClick={() => setActiveTab('bantuan')}
               className="text-rose-700 font-bold underline text-[11px] shrink-0 ml-2"
             >
               Hubungi Bidan
@@ -374,117 +396,80 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
         <main className="flex-1 p-4 pb-24 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto">
           {activeTab === 'beranda' && (
             <div className="space-y-4">
-              {/* 1. Sapaan & Informasi Perinatal (Hamil / Nifas) dalam Satu Kontainer */}
-              <div className="bg-gradient-to-br from-sky-600 via-sky-600 to-sky-700 text-white rounded-3xl p-5 sm:p-6 shadow-sm shadow-sky-200 relative overflow-hidden">
-                <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute right-8 bottom-0 w-32 h-32 bg-sky-400/20 rounded-full blur-xl pointer-events-none" />
+              {/* 1. Sapaan & Informasi Perinatal (Hamil / Nifas) - Solid Sky 500 Card */}
+              <div className="bg-sky-500 text-white rounded-3xl p-4.5 sm:p-5 shadow-sm shadow-sky-200/50 relative overflow-hidden space-y-3">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                    Hai, Ibu {currentUser?.name ? currentUser.name.replace(/^Ny\.\s*/, '') : 'Bunda'}
+                  </h2>
+                  <p className="text-xs text-sky-100 mt-0.5">
+                    {isPregnant
+                      ? 'Semoga Ibu dan calon buah hati senantiasa sehat dan tenang hari ini.'
+                      : 'Semoga masa pemulihan Ibu dan buah hati senantiasa lancar.'}
+                  </p>
+                </div>
 
-                <div className="relative z-10">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/15">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-sky-100 bg-white/15 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
-                          {isPregnant ? 'Fase Kehamilan' : 'Fase Nifas & Menyusui'}
+                {/* Informasi Detail Kehamilan atau Nifas - Clean 2-Column Grid */}
+                <div className="grid grid-cols-2 gap-2.5 pt-1">
+                  {isPregnant ? (
+                    <>
+                      <div className="bg-white/20 backdrop-blur-xs rounded-2xl p-3 border border-white/30 shadow-2xs">
+                        <span className="text-[10px] font-bold text-sky-100 block uppercase tracking-wider">
+                          Usia Kehamilan
                         </span>
-                        <span className="text-[11px] text-sky-100/90 font-medium">
-                          {currentTpmb.name}
+                        <span className="text-base sm:text-lg font-black text-white block leading-tight mt-0.5">
+                          {gestationalWeeks} Minggu
+                        </span>
+                        <span className="text-[10px] text-sky-100 font-medium block mt-0.5">
+                          Trimester {gestationalWeeks <= 12 ? 'I' : gestationalWeeks <= 27 ? 'II' : 'III'}
                         </span>
                       </div>
-                      <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1.5">
-                        Hai, Ibu {currentUser?.name ? currentUser.name.replace(/^Ny\.\s*/, '') : 'Bunda'} 👋
-                      </h2>
-                      <p className="text-xs text-sky-100/90 mt-1 max-w-lg leading-relaxed">
-                        {isPregnant
-                          ? 'Semoga Ibu dan calon buah hati senantiasa sehat, nyaman, serta dilimpahi ketenangan batin dan kebahagiaan hari ini.'
-                          : 'Semoga masa pemulihan Ibu dan buah hati tercinta berjalan lancar, penuh berkah, dan senantiasa dikelilingi kehangatan keluarga.'}
-                      </p>
-                    </div>
 
-                    <div className="hidden sm:flex w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 items-center justify-center shrink-0 text-white shadow-sm">
-                      <HeartPulse className="w-7 h-7" />
-                    </div>
-                  </div>
+                      <div className="bg-white/20 backdrop-blur-xs rounded-2xl p-3 border border-white/30 shadow-2xs">
+                        <span className="text-[10px] font-bold text-sky-100 block uppercase tracking-wider">
+                          Perkiraan Lahir (HPL)
+                        </span>
+                        <span className="text-base sm:text-lg font-black text-white block leading-tight mt-0.5">
+                          {currentUser?.hpl || '12 Jan 2027'}
+                        </span>
+                        <span className="text-[10px] text-sky-100 font-medium block mt-0.5 truncate">
+                          Bidan Pembina TPMB
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="bg-white/20 backdrop-blur-xs rounded-2xl p-3 border border-white/30 shadow-2xs">
+                        <span className="text-[10px] font-bold text-sky-100 block uppercase tracking-wider">
+                          Masa Nifas
+                        </span>
+                        <span className="text-base sm:text-lg font-black text-white block leading-tight mt-0.5">
+                          Hari ke-{postpartumDays}
+                        </span>
+                        <span className="text-[10px] text-sky-100 font-medium block mt-0.5">
+                          Pasca Persalinan
+                        </span>
+                      </div>
 
-                  {/* Informasi Detail Kehamilan atau Nifas */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-                    {isPregnant ? (
-                      <>
-                        <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20">
-                          <span className="text-[11px] font-medium text-sky-100 block">
-                            Usia Kehamilan Saat Ini
-                          </span>
-                          <div className="flex items-baseline gap-2 mt-0.5">
-                            <span className="text-lg sm:text-xl font-extrabold text-white">
-                              {gestationalWeeks} Minggu
-                            </span>
-                            <span className="text-xs text-sky-100 font-semibold">
-                              (Trimester {gestationalWeeks <= 12 ? 'I' : gestationalWeeks <= 27 ? 'II' : 'III'})
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-sky-100/80 mt-1">
-                            {gestationalWeeks >= 37
-                              ? 'Masa aterm (cukup bulan) — siap menyambut kelahiran si kecil'
-                              : gestationalWeeks >= 28
-                              ? 'Trimester III — persiapkan perlengkapan & rencana persalinan'
-                              : 'Perkembangan janin pesat, penuhi nutrisi seimbang & relaksasi teratur'}
-                          </p>
-                        </div>
-
-                        <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20">
-                          <span className="text-[11px] font-medium text-sky-100 block">
-                            Perkiraan Tanggal Persalinan (HPL)
-                          </span>
-                          <div className="flex items-baseline gap-2 mt-0.5">
-                            <span className="text-lg sm:text-xl font-extrabold text-white">
-                              {currentUser?.hpl || '12 Januari 2027'}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-sky-100/80 mt-1">
-                            Bidan Pembina: <strong>{currentTpmb.midwifeName}</strong>
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20">
-                          <span className="text-[11px] font-medium text-sky-100 block">
-                            Masa Pemulihan Nifas
-                          </span>
-                          <div className="flex items-baseline gap-2 mt-0.5">
-                            <span className="text-lg sm:text-xl font-extrabold text-white">
-                              Hari ke-{postpartumDays}
-                            </span>
-                            <span className="text-xs text-sky-100 font-semibold">
-                              (Pasca Persalinan)
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-sky-100/80 mt-1">
-                            Status Kunjungan: <strong>{postpartumDays <= 3 ? 'KF 1 (6-48 jam)' : postpartumDays <= 7 ? 'KF 2 (3-7 hari)' : postpartumDays <= 28 ? 'KF 3 (8-28 hari)' : 'KF 4 (29-42 hari)'}</strong>
-                          </p>
-                        </div>
-
-                        <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20">
-                          <span className="text-[11px] font-medium text-sky-100 block">
-                            Tanggal Persalinan
-                          </span>
-                          <div className="flex items-baseline gap-2 mt-0.5">
-                            <span className="text-lg sm:text-xl font-extrabold text-white">
-                              {currentUser?.deliveryDate
-                                ? new Date(currentUser.deliveryDate).toLocaleDateString('id-ID', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                  })
-                                : '23 September 2026'}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-sky-100/80 mt-1">
-                            Bidan Pembina: <strong>{currentTpmb.midwifeName}</strong>
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      <div className="bg-white/20 backdrop-blur-xs rounded-2xl p-3 border border-white/30 shadow-2xs">
+                        <span className="text-[10px] font-bold text-sky-100 block uppercase tracking-wider">
+                          Tanggal Lahir
+                        </span>
+                        <span className="text-base sm:text-lg font-black text-white block leading-tight mt-0.5 truncate">
+                          {currentUser?.deliveryDate
+                            ? new Date(currentUser.deliveryDate).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })
+                            : '23 Sep 2026'}
+                        </span>
+                        <span className="text-[10px] text-sky-100 font-medium block mt-0.5 truncate">
+                          Bidan Pembina TPMB
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -527,12 +512,12 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
 
                   <div
                     onClick={() => setActiveTab('anc')}
-                    className="p-3.5 bg-teal-50/70 hover:bg-teal-100/70 rounded-2xl border border-teal-100 cursor-pointer transition-colors flex flex-col justify-between"
+                    className="p-3.5 bg-sky-50/70 hover:bg-sky-100/70 rounded-2xl border border-sky-100 cursor-pointer transition-colors flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-900 block">Riwayat & Hasil Terakhir</span>
-                        <span className="text-[10px] font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-sky-800 bg-sky-100 px-2 py-0.5 rounded-full">
                           {latestScreening ? `Skor ${latestScreening.totalScore}/30` : 'Belum Skrining'}
                         </span>
                       </div>
@@ -550,7 +535,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                           : 'Ibu belum mengisi skrining minggu ini. Rutin melakukan evaluasi sangat membantu menjaga ketenangan jiwa.'}
                       </p>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-teal-200/50 flex items-center justify-between text-[11px] font-bold text-teal-700">
+                    <div className="mt-3 pt-2 border-t border-sky-200/50 flex items-center justify-between text-[11px] font-bold text-sky-700">
                       <span>Lihat Grafik & Evaluasi</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
@@ -576,14 +561,14 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div
                     onClick={() => setActiveTab('anc')}
-                    className="p-3.5 bg-emerald-50/70 hover:bg-emerald-100/70 rounded-2xl border border-emerald-100 cursor-pointer transition-colors flex flex-col justify-between"
+                    className="p-3.5 bg-sky-50/70 hover:bg-sky-100/70 rounded-2xl border border-sky-100 cursor-pointer transition-colors flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-900 block">
                           {isPregnant ? 'Pemeriksaan Kehamilan ANC' : 'Pemeriksaan Fisik Masa Nifas'}
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-sky-800 bg-sky-100 px-2 py-0.5 rounded-full">
                           {isPregnant ? 'Standar Kemenkes' : 'Masa Pulih'}
                         </span>
                       </div>
@@ -593,7 +578,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                           : 'Pemeriksaan involusi rahim, pengeluaran cairan lochea, penyembuhan luka perineum, dan kelancaran ASI.'}
                       </p>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-emerald-200/50 flex items-center justify-between text-[11px] font-bold text-emerald-700">
+                    <div className="mt-3 pt-2 border-t border-sky-200/50 flex items-center justify-between text-[11px] font-bold text-sky-700">
                       <span>Jadwalkan Kunjungan TPMB</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
@@ -601,12 +586,12 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
 
                   <div
                     onClick={() => setActiveTab('anc')}
-                    className="p-3.5 bg-blue-50/70 hover:bg-blue-100/70 rounded-2xl border border-blue-100 cursor-pointer transition-colors flex flex-col justify-between"
+                    className="p-3.5 bg-sky-50/70 hover:bg-sky-100/70 rounded-2xl border border-sky-100 cursor-pointer transition-colors flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-900 block">Konseling & Tanya Jawab Bidan</span>
-                        <span className="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-sky-800 bg-sky-100 px-2 py-0.5 rounded-full">
                           Tatap Muka / Telepon
                         </span>
                       </div>
@@ -614,7 +599,7 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
                         Konsultasikan keluhan mual/pusing, kekhawatiran menjelang persalinan, atau perawatan bayi baru lahir langsung dengan Bidan {currentTpmb.midwifeName}.
                       </p>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-blue-200/50 flex items-center justify-between text-[11px] font-bold text-blue-700">
+                    <div className="mt-3 pt-2 border-t border-sky-200/50 flex items-center justify-between text-[11px] font-bold text-sky-700">
                       <span>Buat Janji Konsultasi</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
@@ -737,6 +722,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
           {activeTab === 'latihan' && (
             <SicringModuleView
               onOpenConsultationModal={() => setIsConsultationOpen(true)}
+              onDetailModeChange={setIsChildDetailActive}
+              isDetailActive={isChildDetailActive}
             />
           )}
 
@@ -752,6 +739,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
             <UserMentalEducationView
               onStartScreening={() => setIsScreeningOpen(true)}
               onGoToSicring={() => setActiveTab('latihan')}
+              onDetailModeChange={setIsChildDetailActive}
+              isDetailActive={isChildDetailActive}
             />
           )}
 
@@ -761,70 +750,76 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
               onSwitchToAdmin={onSwitchToAdmin}
             />
           )}
+
+          {activeTab === 'bantuan' && (
+            <EmergencyHelpView onBack={() => setActiveTab('beranda')} />
+          )}
         </main>
 
-        {/* Mobile Fixed Bottom Navigation Bar */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2 z-40 flex items-center justify-around shadow-lg select-none">
-          <button
-            onClick={() => setActiveTab('beranda')}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
-              activeTab === 'beranda'
-                ? 'text-sky-600 font-bold'
-                : 'text-slate-400 hover:text-slate-600 font-medium'
-            }`}
-          >
-            <Home className="w-4.5 h-4.5" />
-            <span className="text-[10px]">Beranda</span>
-          </button>
+        {/* Mobile Fixed Bottom Navigation Bar - Hidden on full page detail views */}
+        {!isFullDetailPage && (
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2 z-40 flex items-center justify-around shadow-lg select-none">
+            <button
+              onClick={() => setActiveTab('beranda')}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+                activeTab === 'beranda'
+                  ? 'text-sky-600 font-bold'
+                  : 'text-slate-400 hover:text-slate-600 font-medium'
+              }`}
+            >
+              <Home className="w-4.5 h-4.5" />
+              <span className="text-[10px]">Beranda</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('latihan')}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
-              activeTab === 'latihan'
-                ? 'text-sky-600 font-bold'
-                : 'text-slate-400 hover:text-slate-600 font-medium'
-            }`}
-          >
-            <Heart className="w-4.5 h-4.5" />
-            <span className="text-[10px]">SICRING</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('latihan')}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+                activeTab === 'latihan'
+                  ? 'text-sky-600 font-bold'
+                  : 'text-slate-400 hover:text-slate-600 font-medium'
+              }`}
+            >
+              <Heart className="w-4.5 h-4.5" />
+              <span className="text-[10px]">SICRING</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('anc')}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
-              activeTab === 'anc' || activeTab === 'riwayat'
-                ? 'text-sky-600 font-bold'
-                : 'text-slate-400 hover:text-slate-600 font-medium'
-            }`}
-          >
-            <HeartHandshake className="w-4.5 h-4.5" />
-            <span className="text-[10px]">ANC</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('anc')}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+                activeTab === 'anc' || activeTab === 'riwayat'
+                  ? 'text-sky-600 font-bold'
+                  : 'text-slate-400 hover:text-slate-600 font-medium'
+              }`}
+            >
+              <HeartHandshake className="w-4.5 h-4.5" />
+              <span className="text-[10px]">ANC</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('edukasi')}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
-              activeTab === 'edukasi'
-                ? 'text-sky-600 font-bold'
-                : 'text-slate-400 hover:text-slate-600 font-medium'
-            }`}
-          >
-            <BookOpen className="w-4.5 h-4.5" />
-            <span className="text-[10px]">Edukasi</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('edukasi')}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+                activeTab === 'edukasi'
+                  ? 'text-sky-600 font-bold'
+                  : 'text-slate-400 hover:text-slate-600 font-medium'
+              }`}
+            >
+              <BookOpen className="w-4.5 h-4.5" />
+              <span className="text-[10px]">Edukasi</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('profil')}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
-              activeTab === 'profil'
-                ? 'text-sky-600 font-bold'
-                : 'text-slate-400 hover:text-slate-600 font-medium'
-            }`}
-          >
-            <UserIcon className="w-4.5 h-4.5" />
-            <span className="text-[10px]">Profil</span>
-          </button>
-        </nav>
+            <button
+              onClick={() => setActiveTab('profil')}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-colors ${
+                activeTab === 'profil'
+                  ? 'text-sky-600 font-bold'
+                  : 'text-slate-400 hover:text-slate-600 font-medium'
+              }`}
+            >
+              <UserIcon className="w-4.5 h-4.5" />
+              <span className="text-[10px]">Profil</span>
+            </button>
+          </nav>
+        )}
       </div>
 
       {/* Modals */}
@@ -844,13 +839,8 @@ export const UserAppView: React.FC<UserAppViewProps> = ({ onSwitchToAdmin }) => 
         }}
         onOpenEmergency={() => {
           setIsResultOpen(false);
-          setIsEmergencyOpen(true);
+          setActiveTab('bantuan');
         }}
-      />
-
-      <EmergencyHelpModal
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
       />
 
       <UserConsultationModal

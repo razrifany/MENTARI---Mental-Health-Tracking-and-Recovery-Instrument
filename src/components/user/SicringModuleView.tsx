@@ -42,10 +42,14 @@ import {
 
 interface SicringModuleViewProps {
   onOpenConsultationModal: () => void;
+  onDetailModeChange?: (isDetail: boolean) => void;
+  isDetailActive?: boolean;
 }
 
 export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
   onOpenConsultationModal,
+  onDetailModeChange,
+  isDetailActive,
 }) => {
   const {
     sicringModules,
@@ -59,6 +63,23 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
 
   // Mode: 'exercise' (Latihan Mandiri Interaktif - default/halaman pertama) or 'panduan' (Panduan Video/Audio/Teks)
   const [activeMode, setActiveMode] = useState<'panduan' | 'exercise'>('exercise');
+
+  // Track previous parent detail active prop value to prevent race condition flashing
+  const prevIsDetailActiveRef = useRef(isDetailActive);
+
+  // Sync with parent layout header back button & full page detail state
+  useEffect(() => {
+    if (onDetailModeChange) {
+      onDetailModeChange(activeMode === 'panduan');
+    }
+  }, [activeMode, onDetailModeChange]);
+
+  useEffect(() => {
+    if (prevIsDetailActiveRef.current === true && isDetailActive === false && activeMode === 'panduan') {
+      setActiveMode('exercise');
+    }
+    prevIsDetailActiveRef.current = isDetailActive;
+  }, [isDetailActive, activeMode]);
 
   // Currently viewed guide component
   const [selectedGuideKey, setSelectedGuideKey] = useState<SicringComponentKey>('olah_tubuh');
@@ -290,124 +311,13 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
-      {/* 1. Header Banner & Aggregate Kemajuan */}
-      <div className="bg-gradient-to-r from-sky-600 via-sky-600 to-indigo-600 rounded-3xl p-5 sm:p-6 text-white shadow-sm shadow-sky-200 relative overflow-hidden">
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-100">
-            <Sparkles className="w-4 h-4 text-sky-200" />
-            <span>Intervensi Psikospiritual SICRING Perinatal</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold mt-1">Latihan Mandiri & Pemulihan Batin</h2>
-          <p className="text-xs text-sky-100 mt-1 max-w-xl leading-relaxed">
-            Praktikkan latihan ketenangan terarah dengan timer interaktif. Ibu juga dapat membuka panduan per bagian (video tutorial, audio relaksasi, dan teks) kapan saja.
-          </p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/20">
-            <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3 border border-white/15">
-              <span className="text-[10px] text-sky-100 uppercase tracking-wider font-semibold block">Sesi Latihan Tuntas</span>
-              <span className="text-xl font-black text-white mt-0.5">{completedCount} Sesi</span>
-              <span className="text-[10px] text-sky-200 block">Tercatat di TPMB</span>
-            </div>
-            <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3 border border-white/15">
-              <span className="text-[10px] text-sky-100 uppercase tracking-wider font-semibold block">Total Menit Relaksasi</span>
-              <span className="text-xl font-black text-white mt-0.5">{totalMinutes} Menit</span>
-              <span className="text-[10px] text-sky-200 block">Ketenangan aktif</span>
-            </div>
-            <div className="col-span-2 sm:col-span-1 bg-white/10 backdrop-blur-xs rounded-2xl p-3 border border-white/15 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-sky-100 uppercase tracking-wider font-semibold block">Status Panduan</span>
-                <span className="text-sm font-bold text-white mt-0.5">5 Modul Lengkap</span>
-                <span className="text-[10px] text-sky-200 block">Video, Audio & Teks</span>
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
-                <Award className="w-5 h-5 text-amber-300" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative ambient blur */}
-        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 pointer-events-none blur-2xl" />
-      </div>
-
       {/* ======================================================================= */}
       {/* MODE 1: PANDUAN SICRING PER BAGIAN (VIDEO, AUDIO & PANDUAN TEKS)        */}
       {/* ======================================================================= */}
       {activeMode === 'panduan' && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          {/* Top Back Navigation to Latihan Mandiri */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setActiveMode('exercise')}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-sky-50 hover:bg-sky-100 border border-sky-200 hover:border-sky-300 text-sky-800 rounded-xl text-xs font-bold transition-all shadow-2xs self-start"
-            >
-              <ArrowLeft className="w-4 h-4 text-sky-700" />
-              <span>Kembali ke Latihan Mandiri (Exercise Timer)</span>
-            </button>
-
-            <span className="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-              <span>Panduan Per Bagian (Video, Audio & Teks)</span>
-            </span>
-          </div>
-          {/* Quick Module Tabs / Chips */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Pilih Komponen SICRING:
-              </span>
-              <span className="text-[11px] text-slate-400">
-                Tersedia Video HD, Audio Relaksasi & Panduan Teks
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {sicringModules.map((m) => {
-                const isSelected = selectedGuideKey === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setSelectedGuideKey(m.id as SicringComponentKey)}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                      isSelected
-                        ? 'border-sky-500 bg-sky-50/80 shadow-2xs ring-2 ring-sky-500/20'
-                        : 'border-slate-200 hover:border-sky-200 bg-white hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
-                          isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {m.number}
-                      </span>
-                      {isSelected && (
-                        <span className="text-[10px] font-bold text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded-md">
-                          Aktif
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2">
-                      <span className="text-xs font-bold text-slate-900 block truncate">
-                        {m.title.split('(')[0]}
-                      </span>
-                      <span className="text-[10px] text-slate-500 block truncate mt-0.5">
-                        {m.durationMinutes} menit &bull; {m.targetAudience === 'ibu_dan_pendamping' ? 'Suami' : 'Ibu'}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Active Guide Container */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="space-y-4 pb-28 sm:pb-24 animate-in fade-in duration-200">
             {/* Guide Header Banner */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="pb-4 sm:pb-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-full">
@@ -938,7 +848,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                   </div>
                 ) : (
                   /* READ MODE: CLEAN TYPOGRAPHIC TEXT READER */
-                  <div className="bg-slate-50/70 rounded-2xl border border-slate-200 p-5 sm:p-7 space-y-4">
+                  <div className="py-2 space-y-5">
                     {(() => {
                       const text =
                         sicringTextGuides?.[selectedGuideKey] ||
@@ -947,7 +857,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                       const paragraphs = text.split('\n\n');
 
                       return (
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                           {paragraphs.map((para, pIdx) => {
                             const trimmed = para.trim();
                             if (!trimmed) return null;
@@ -970,11 +880,8 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                               const contentLines = lines.slice(1);
 
                               return (
-                                <div
-                                  key={pIdx}
-                                  className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs space-y-2"
-                                >
-                                  <h5 className="font-bold text-sky-950 text-xs sm:text-sm flex items-center gap-2">
+                                <div key={pIdx} className="space-y-2 pt-1">
+                                  <h5 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
                                     <span className="w-5 h-5 rounded-md bg-sky-100 text-sky-700 text-[11px] font-bold flex items-center justify-center shrink-0">
                                       {title.match(/^\d+/)?.[0]}
                                     </span>
@@ -982,7 +889,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                                   </h5>
 
                                   {contentLines.length > 0 && (
-                                    <div className="space-y-1.5 pl-7 text-xs text-slate-700 leading-relaxed">
+                                    <div className="space-y-1.5 pl-7 text-xs sm:text-sm text-slate-600 leading-relaxed">
                                       {contentLines.map((line, lIdx) => {
                                         const cleanLine = line.trim();
                                         if (cleanLine.startsWith('•') || cleanLine.startsWith('-')) {
@@ -1016,7 +923,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                               return (
                                 <div
                                   key={pIdx}
-                                  className="p-4 bg-purple-50 rounded-xl border border-purple-200 text-purple-950 italic text-xs sm:text-sm leading-relaxed"
+                                  className="p-4 bg-purple-50/80 rounded-2xl border border-purple-200 text-purple-950 italic text-xs sm:text-sm leading-relaxed"
                                 >
                                   {trimmed}
                                 </div>
@@ -1035,7 +942,7 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                     })()}
 
                     {/* Simple Footer footnote */}
-                    <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="pt-4 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400">
                       <span>Materi Panduan Standar Asuhan Kebidanan Perinatal</span>
                       <span className="flex items-center gap-1 text-sky-700 font-medium">
                         <Check className="w-3 h-3 text-emerald-600" />
@@ -1047,34 +954,29 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
               </div>
             )}
 
-            {/* Bottom Action Banner (Bridge from Panduan to Exercise) */}
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-sky-50 via-slate-50 to-sky-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 block">
-                  Langkah Selanjutnya
-                </span>
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm mt-0.5">
-                  Sudah memahami panduan {currentGuide.title}?
-                </h4>
-                <p className="text-[11px] text-slate-500">
-                  Ibu siap untuk mulai mempraktikkannya dengan timer bimbingan interaktif.
-                </p>
+            {/* Footnote inside guide */}
+            <div className="pt-4 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Materi Panduan Standar Asuhan Kebidanan Perinatal</span>
+              <span className="flex items-center gap-1 text-sky-700 font-semibold">
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                Terverifikasi Bidan TPMB
+              </span>
+            </div>
+
+          {/* Fixed Bottom Navigation Bar */}
+          <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 p-3.5 sm:p-4 shadow-lg animate-in slide-in-from-bottom-2 duration-200">
+            <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+              <div className="hidden sm:block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 block">Siap Melakukan Latihan?</span>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1">{currentGuide.title}</h4>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setActiveMode('exercise')}
-                  className="px-3.5 py-2.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors shadow-2xs"
-                >
-                  Kembali ke Daftar Latihan
-                </button>
-
+              <div className="w-full sm:w-auto">
                 {selectedGuideKey === 'pendampingan' ? (
                   <button
                     type="button"
                     onClick={onOpenConsultationModal}
-                    className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-95 shrink-0"
+                    className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
                   >
                     <Calendar className="w-4 h-4" />
                     <span>Jadwalkan Konsultasi Bidan</span>
@@ -1083,11 +985,11 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                   <button
                     type="button"
                     onClick={() => handleLaunchExercise(selectedGuideKey)}
-                    className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm shadow-sky-200 transition-transform active:scale-95 shrink-0"
+                    className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-sky-200 transition-all active:scale-[0.98] cursor-pointer"
                   >
-                    <Play className="w-4 h-4" />
-                    <span>Mulai Latihan (Exercise) Sekarang</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <Play className="w-4 h-4 fill-white" />
+                    <span>Mulai Latihan Sekarang</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -1101,6 +1003,43 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
       {/* ======================================================================= */}
       {activeMode === 'exercise' && (
         <div className="space-y-4 animate-in fade-in duration-200">
+          {/* Header Banner & Aggregate Kemajuan - Clean Solid Sky 500 Card */}
+          <div className="bg-sky-500 text-white rounded-3xl p-4.5 sm:p-5 shadow-sm shadow-sky-200/50 relative overflow-hidden space-y-3">
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/30 backdrop-blur-xs">
+                  ✨ Intervensi Psikospiritual SICRING Perinatal
+                </span>
+              </div>
+
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                Latihan Mandiri &amp; Pemulihan Batin
+              </h2>
+
+              <p className="text-xs text-sky-100 mt-1 leading-relaxed">
+                Praktikkan latihan ketenangan terarah dengan timer interaktif, panduan video, audio relaksasi, dan teks.
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/20 text-xs">
+                <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/20">
+                  <span className="text-[10px] text-sky-100 uppercase tracking-wider font-bold block">Sesi Tuntas</span>
+                  <span className="text-base sm:text-lg font-bold text-white mt-0.5">{completedCount} Sesi</span>
+                </div>
+
+                <div className="bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/20">
+                  <span className="text-[10px] text-sky-100 uppercase tracking-wider font-bold block">Total Menit</span>
+                  <span className="text-base sm:text-lg font-bold text-white mt-0.5">{totalMinutes} Menit</span>
+                </div>
+
+                <div className="col-span-2 sm:col-span-1 bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/20 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-sky-100 uppercase tracking-wider font-bold block">Status Modul</span>
+                    <span className="text-xs sm:text-sm font-bold text-white mt-0.5">5 Modul Lengkap</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
             <div>
               <div className="flex items-center gap-2">
@@ -1143,38 +1082,59 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
               return (
                 <div
                   key={module.id}
-                  className="bg-white rounded-2xl border border-slate-200 hover:border-sky-300 p-4 transition-all shadow-xs hover:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  onClick={() => {
+                    setSelectedGuideKey(module.id as SicringComponentKey);
+                    setActiveMode('panduan');
+                  }}
+                  className={`rounded-3xl p-4 sm:p-4.5 transition-all shadow-2xs hover:shadow-md flex items-center justify-between gap-3.5 border cursor-pointer active:scale-[0.99] ${
+                    isPendampingan
+                      ? 'bg-purple-50/50 border-purple-200/80 hover:border-purple-300'
+                      : 'bg-white border-slate-200/90 hover:border-sky-300'
+                  }`}
                 >
-                  <div className="flex items-start gap-3.5">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shrink-0 ${
+                      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 ${
                         isPendampingan
-                          ? 'bg-purple-100 text-purple-700'
+                          ? 'bg-purple-600 text-white shadow-2xs'
                           : 'bg-sky-100 text-sky-700'
                       }`}
                     >
                       {module.number}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-slate-900 text-sm">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className={`font-bold text-sm ${isPendampingan ? 'text-purple-950' : 'text-slate-900'}`}>
                           {module.title}
                         </h4>
+                        {isPendampingan && (
+                          <span className="bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            🩺 Fitur Bidan TPMB
+                          </span>
+                        )}
                         {hasDone && (
-                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                            <Check className="w-2.5 h-2.5" />
-                            Pernah Dilakukan
+                          <span className="bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                            <Check className="w-2.5 h-2.5 text-sky-600" />
+                            Selesai
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{module.subtitle}</p>
-                      <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-400 font-medium">
-                        <span>⏱ {module.durationMinutes} menit</span>
+                      <p className={`text-xs mt-0.5 line-clamp-1 ${isPendampingan ? 'text-purple-800/80 font-medium' : 'text-slate-500'}`}>
+                        {module.subtitle}
+                      </p>
+                      <div className="flex items-center gap-2.5 mt-1.5 text-[11px] text-slate-400 font-medium">
+                        <span className={isPendampingan ? 'text-purple-700 font-bold' : 'text-slate-600 font-semibold'}>
+                          ⏱ {module.durationMinutes} menit
+                        </span>
                         <span>&bull;</span>
                         <span className="flex items-center gap-1">
                           {module.targetAudience === 'ibu_dan_pendamping' ? (
                             <>
                               <Users className="w-3 h-3 text-amber-500" /> Bersama Suami/Keluarga
+                            </>
+                          ) : isPendampingan ? (
+                            <>
+                              <Heart className="w-3 h-3 text-purple-600" /> Sesi 1-on-1 Bidan TPMB
                             </>
                           ) : (
                             <>
@@ -1186,37 +1146,9 @@ export const SicringModuleView: React.FC<SicringModuleViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedGuideKey(module.id as SicringComponentKey);
-                        setActiveMode('panduan');
-                      }}
-                      className="px-3 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
-                      title="Lihat panduan video, audio & teks untuk bagian ini"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Lihat Panduan</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleLaunchExercise(module.id as SicringComponentKey)}
-                      className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
-                    >
-                      {isPendampingan ? (
-                        <>
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>Konsultasi</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5" />
-                          <span>Mulai Latihan</span>
-                        </>
-                      )}
-                    </button>
+                  {/* Clean Right Chevron Indicator */}
+                  <div className="shrink-0 text-slate-400 pl-1">
+                    <ChevronRight className="w-5 h-5 text-slate-400" />
                   </div>
                 </div>
               );

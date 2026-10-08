@@ -678,16 +678,29 @@ export const TpmbClinicalDashboard: React.FC<TpmbClinicalDashboardProps> = ({
           (Ditempatkan di bawah Pie Chart sesuai instruksi)
       ======================================================== */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-rose-600 animate-ping" />
             <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
               <span>PERHATIAN DARURAT: Triase Red Flag (Item 10 &gt; 0)</span>
             </h3>
           </div>
-          <span className="text-xs font-black bg-rose-600 text-white px-3 py-1 rounded-full shadow-2xs">
-            {redFlagCases.length} Pasien Butuh Respon
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black bg-rose-600 text-white px-3 py-1 rounded-full shadow-2xs">
+              {redFlagCases.length} Pasien Butuh Respon
+            </span>
+            {onNavigateToPatients && (
+              <button
+                type="button"
+                onClick={() => onNavigateToPatients('red_flag')}
+                className="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs transition-all flex items-center gap-1 cursor-pointer"
+                title="Buka daftar pasien TPMB yang terfilter kategori Red Flag"
+              >
+                <span>Lihat Selengkapnya</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {redFlagCases.length === 0 ? (
@@ -798,7 +811,7 @@ export const TpmbClinicalDashboard: React.FC<TpmbClinicalDashboardProps> = ({
           (Ditempatkan di bawah Red Flag)
       ======================================================== */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 className="font-bold text-slate-900 text-base">
               Kasus Risiko Tinggi (Skor EPDS ≥ 13)
@@ -807,9 +820,22 @@ export const TpmbClinicalDashboard: React.FC<TpmbClinicalDashboardProps> = ({
               SLA tindak lanjut 1x24 jam untuk penjadwalan konseling psikologis atau kunjungan rumah.
             </p>
           </div>
-          <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
-            {highCases.length} Kasus Aktif
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full shrink-0">
+              {highCases.length} Kasus Aktif
+            </span>
+            {onNavigateToPatients && (
+              <button
+                type="button"
+                onClick={() => onNavigateToPatients('tinggi')}
+                className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                title="Buka daftar pasien TPMB yang terfilter kategori Risiko Tinggi"
+              >
+                <span>Lihat Selengkapnya</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {highCases.length === 0 ? (
