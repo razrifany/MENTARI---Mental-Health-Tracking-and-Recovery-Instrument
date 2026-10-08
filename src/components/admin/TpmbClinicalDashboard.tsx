@@ -16,6 +16,10 @@ import {
   TrendingUp,
   FileCheck,
   HelpCircle,
+  ArrowRight,
+  ChevronRight,
+  UserX,
+  AlertOctagon,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { User, FollowUpCase, EPDSScreeningResult } from '../../types';
@@ -24,12 +28,14 @@ interface TpmbClinicalDashboardProps {
   mode: 'bidan' | 'peneliti';
   initialTpmbId?: string;
   onOpenPatientDetail?: (patient: User) => void;
+  onNavigateToPatients?: (riskFilter: 'red_flag' | 'tinggi' | 'semua') => void;
 }
 
 export const TpmbClinicalDashboard: React.FC<TpmbClinicalDashboardProps> = ({
   mode,
   initialTpmbId,
   onOpenPatientDetail,
+  onNavigateToPatients,
 }) => {
   const { currentUser, users, tpmbList, screenings, cases } = useApp();
 
